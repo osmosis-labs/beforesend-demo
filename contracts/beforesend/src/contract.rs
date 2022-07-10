@@ -60,9 +60,11 @@ pub fn query(_deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
 
 #[cfg(test)]
 mod tests {
+    use std::vec;
+
     use super::*;
-    use cosmwasm_std::coins;
     use cosmwasm_std::testing::{mock_dependencies, mock_env, mock_info};
+    use cosmwasm_std::{coin, coins, Coin};
 
     #[test]
     fn proper_initialization() {
@@ -86,17 +88,33 @@ mod tests {
 
         // Make sure a non 100 token send passes
         let msg = SudoMsg::BeforeSend {
-            from: Addr::unchecked("creator"),
-            to: Addr::unchecked("anyone"),
+            from: String::from("addr0"),
+            to: String::from("addr1"),
             amount: coins(1, "uosmo"),
         };
         sudo(deps.as_mut(), mock_env(), msg).unwrap();
 
         // Make sure a non 100 token send fails
         let msg = SudoMsg::BeforeSend {
-            from: Addr::unchecked("creator"),
-            to: Addr::unchecked("anyone"),
+            from: String::from("addr0"),
+            to: String::from("addr1"),
             amount: coins(100, "uosmo"),
+        };
+        sudo(deps.as_mut(), mock_env(), msg).unwrap_err();
+
+        // Make sure multiple coins, all not 100 passes
+        let msg = SudoMsg::BeforeSend {
+            from: String::from("addr0"),
+            to: String::from("addr1"),
+            amount: Vec::from([coin(1, "uosmo"), coin(1, "uion")]),
+        };
+        sudo(deps.as_mut(), mock_env(), msg).unwrap();
+
+        // Make sure multiple coins, one of which is 100 fails
+        let msg = SudoMsg::BeforeSend {
+            from: String::from("addr0"),
+            to: String::from("addr1"),
+            amount: Vec::from([coin(1, "uosmo"), coin(100, "uion")]),
         };
         sudo(deps.as_mut(), mock_env(), msg).unwrap_err();
     }

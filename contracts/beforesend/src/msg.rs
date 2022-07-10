@@ -12,8 +12,8 @@ pub struct InstantiateMsg {}
 #[serde(rename_all = "snake_case")]
 pub enum SudoMsg {
     BeforeSend {
-        from: Addr,
-        to: Addr,
+        from: String,
+        to: String,
         amount: Vec<Coin>,
     },
 }
