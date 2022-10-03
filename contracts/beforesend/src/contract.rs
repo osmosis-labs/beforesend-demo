@@ -29,13 +29,11 @@ pub fn instantiate(
 #[entry_point]
 pub fn sudo(_deps: DepsMut, _env: Env, msg: SudoMsg) -> Result<Response, ContractError> {
     match msg {
-        SudoMsg::BeforeSend { from, to, amount } => {
-            for coin in amount.into_iter() {
-                if coin.amount == Uint128::from(100u64) {
-                    return Err(ContractError::CustomError {
-                        val: String::from("Invalid Send Amount"),
-                    });
-                }
+        SudoMsg::BlockBeforeSend { from, to, amount } => {
+            if amount.amount == Uint128::from(100u64) {
+                return Err(ContractError::CustomError {
+                    val: String::from("Invalid Send Amount"),
+                });
             }
 
             Ok(Response::new())
@@ -87,34 +85,18 @@ mod tests {
         let _res = instantiate(deps.as_mut(), mock_env(), info, msg).unwrap();
 
         // Make sure a non 100 token send passes
-        let msg = SudoMsg::BeforeSend {
+        let msg = SudoMsg::BlockBeforeSend {
             from: String::from("addr0"),
             to: String::from("addr1"),
-            amount: coins(1, "uosmo"),
+            amount: coin(1, "uosmo"),
         };
         sudo(deps.as_mut(), mock_env(), msg).unwrap();
 
         // Make sure a non 100 token send fails
-        let msg = SudoMsg::BeforeSend {
+        let msg = SudoMsg::BlockBeforeSend {
             from: String::from("addr0"),
             to: String::from("addr1"),
-            amount: coins(100, "uosmo"),
-        };
-        sudo(deps.as_mut(), mock_env(), msg).unwrap_err();
-
-        // Make sure multiple coins, all not 100 passes
-        let msg = SudoMsg::BeforeSend {
-            from: String::from("addr0"),
-            to: String::from("addr1"),
-            amount: Vec::from([coin(1, "uosmo"), coin(1, "uion")]),
-        };
-        sudo(deps.as_mut(), mock_env(), msg).unwrap();
-
-        // Make sure multiple coins, one of which is 100 fails
-        let msg = SudoMsg::BeforeSend {
-            from: String::from("addr0"),
-            to: String::from("addr1"),
-            amount: Vec::from([coin(1, "uosmo"), coin(100, "uion")]),
+            amount: coin(100, "uosmo"),
         };
         sudo(deps.as_mut(), mock_env(), msg).unwrap_err();
     }
