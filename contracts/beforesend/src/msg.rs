@@ -11,12 +11,18 @@ pub struct InstantiateMsg {}
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum SudoMsg {
-    BeforeSend {
+    BlockBeforeSend {
         from: String,
         to: String,
-        amount: Vec<Coin>,
+        amount: Coin,
+    },
+    TrackBeforeSend {
+        from: String,
+        to: String,
+        amount: Coin,
     },
 }
+
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
