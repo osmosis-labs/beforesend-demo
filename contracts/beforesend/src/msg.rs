@@ -16,7 +16,13 @@ pub enum SudoMsg {
         to: String,
         amount: Coin,
     },
+    TrackBeforeSend {
+        from: String,
+        to: String,
+        amount: Coin,
+    },
 }
+
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]

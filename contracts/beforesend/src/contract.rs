@@ -30,6 +30,7 @@ pub fn instantiate(
 pub fn sudo(_deps: DepsMut, _env: Env, msg: SudoMsg) -> Result<Response, ContractError> {
     match msg {
         SudoMsg::BlockBeforeSend { from, to, amount } => {
+            // return error if any coin amount is 100
             if amount.amount == Uint128::from(100u64) {
                 return Err(ContractError::CustomError {
                     val: String::from("Invalid Send Amount"),
@@ -38,6 +39,11 @@ pub fn sudo(_deps: DepsMut, _env: Env, msg: SudoMsg) -> Result<Response, Contrac
 
             Ok(Response::new())
         }
+        SudoMsg::TrackBeforeSend { from, to, amount } => {
+            // pass on track before send for now
+            Ok(Response::new())
+        }
+        
     }
 }
 
