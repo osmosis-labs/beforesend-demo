@@ -105,5 +105,21 @@ mod tests {
             amount: coin(100, "uosmo"),
         };
         sudo(deps.as_mut(), mock_env(), msg).unwrap_err();
+
+        // Make sure a non 100 token send fails
+        let msg = SudoMsg::BlockBeforeSend {
+            from: String::from("addr0"),
+            to: String::from("addr1"),
+            amount: coin(100, "uosmo"),
+        };
+        sudo(deps.as_mut(), mock_env(), msg).unwrap_err();
+
+        // Track before send should return ok value
+        let msg = SudoMsg::TrackBeforeSend {
+            from: String::from("addr0"),
+            to: String::from("addr1"),
+            amount: coin(100, "uosmo"),
+        };
+        sudo(deps.as_mut(), mock_env(), msg).unwrap();
     }
 }
